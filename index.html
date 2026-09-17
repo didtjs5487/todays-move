@@ -145,6 +145,26 @@ body[data-view="today"] .wrap{padding-block-end:184px}
 .swap:hover{color:var(--ember); border-color:var(--ember)}
 .note{font-size:12px; color:var(--mute); margin:12px 0 0; line-height:1.55}
 
+/* ── 막대 인형 ── */
+.fig{display:block; width:100%; height:100%}
+.fig .st{fill:none; stroke:var(--ink); stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round}
+.fig .hd{fill:var(--ink)}
+.fig .f0 .st{stroke:var(--mute); opacity:.38; stroke-width:2.8}
+.fig .f0 .hd{fill:var(--mute); opacity:.38}
+.fig .pr{fill:none; stroke:var(--ember); stroke-width:4.4; stroke-linecap:round}
+.fig .bd{fill:none; stroke:var(--ice); stroke-width:2.2; stroke-dasharray:4 3}
+.fig .gd{fill:none; stroke:var(--line); stroke-width:2; stroke-dasharray:4 4}
+/* 크게 볼 때는 두 자세를 번갈아 — 움직임이 한눈에 보이게 */
+@keyframes figA{0%,42%{opacity:1}54%,100%{opacity:.14}}
+@keyframes figB{0%,42%{opacity:.14}54%,100%{opacity:1}}
+.fig.play .f0{animation:figA 1.7s infinite}
+.fig.play .f1{animation:figB 1.7s infinite}
+.fig.play .f0 .st{stroke:var(--ink); opacity:1; stroke-width:3.4}
+.fig.play .f0 .hd{fill:var(--ink); opacity:1}
+.thumb{flex:none; width:42px; height:42px; background:var(--bg3); border-radius:4px; padding:0}
+.set .thumb{width:46px; height:46px}
+.lib .thumb{width:50px; height:50px}
+
 /* ── 아래 독 ── */
 .dock{position:fixed; left:0; right:0; bottom:0; z-index:40;
   background:var(--bg2); border-top:1px solid var(--line);
@@ -228,6 +248,42 @@ body[data-view="today"] .wrap{padding-block-end:184px}
   color:var(--mute); flex:none; text-align:right; padding-top:4px}
 .lib .it .meta em{font-style:normal; color:var(--ice); display:block}
 
+/* ── 동작 설명 시트 ── */
+.sheet{position:fixed; inset:0; z-index:70; background:var(--bg); overflow-y:auto;
+  padding:env(safe-area-inset-top, 0px) 18px calc(26px + env(safe-area-inset-bottom, 0px))}
+.sheet .in{max-width:620px; margin:0 auto}
+.sh-top{display:flex; align-items:center; gap:10px; padding:14px 0 4px}
+.sh-top .lbl{flex:1}
+.sh-x{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.1em; color:var(--mute); padding:4px 6px}
+.sh-x:hover{color:var(--ember)}
+.sh-fig{width:min(58vw,190px); height:min(58vw,190px); margin:6px auto 2px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:6px}
+.sh-name{font-family:"Hahmlet",serif; font-weight:800; font-size:clamp(23px,6.4vw,30px);
+  text-align:center; line-height:1.2}
+.sh-tags{font-family:"Space Mono",monospace; font-size:10.5px; letter-spacing:.12em;
+  color:var(--mute); text-align:center; margin:6px 0 0}
+.sh-cue{background:var(--bg2); border-left:2px solid var(--ember); border-radius:0 4px 4px 0;
+  padding:10px 13px; margin:16px 0 0; font-size:13.5px; line-height:1.6}
+.steps{counter-reset:st; margin-top:2px}
+.steps li{counter-increment:st; display:flex; gap:11px; padding:10px 0; border-bottom:1px solid var(--hair);
+  font-size:14px; line-height:1.55}
+.steps li::before{content:counter(st); font-family:"Space Mono",monospace; font-size:12px;
+  color:var(--ember); flex:none; padding-top:2px}
+.sh-bad{font-size:12.5px; color:var(--ink2); margin:14px 0 0; line-height:1.9}
+.sh-bad b{font-family:"Space Mono",monospace; font-size:10px; letter-spacing:.12em; color:var(--ember);
+  border:1px solid var(--ember); border-radius:3px; padding:2px 6px; margin-right:7px}
+.alts{display:flex; flex-wrap:wrap; gap:7px}
+.alt{background:var(--bg2); border:1px solid var(--line); border-radius:4px; padding:8px 11px;
+  font-size:13px; color:var(--ink2); display:flex; align-items:center; gap:7px}
+.alt em{font-style:normal; font-family:"Space Mono",monospace; font-size:9.5px; letter-spacing:.1em; color:var(--mute)}
+.alt:hover{border-color:var(--ember); color:var(--ink)}
+.sh-acts{display:flex; gap:8px; flex-wrap:wrap; margin-top:22px}
+.sh-acts a,.sh-acts button{flex:1; min-width:140px; text-align:center; text-decoration:none;
+  border:1px solid var(--line); border-radius:4px; padding:13px 10px; font-size:13.5px; color:var(--ink2)}
+.sh-acts .go{background:var(--ember); border-color:var(--ember); color:var(--onember);
+  font-family:"Hahmlet",serif; font-weight:800; font-size:15px}
+.sh-acts a:hover{border-color:var(--mute); color:var(--ink)}
+
 /* ── 타이머 ── */
 .stage{position:fixed; inset:0; z-index:60; background:var(--bg); display:flex; flex-direction:column;
   padding:env(safe-area-inset-top, 0px) 18px calc(14px + env(safe-area-inset-bottom, 0px))}
@@ -251,6 +307,9 @@ body[data-view="today"] .wrap{padding-block-end:184px}
   align-items:center; justify-content:center; gap:2px}
 .clock{font-family:"Space Mono",monospace; font-weight:700; font-size:clamp(46px,15vw,66px); line-height:1}
 .unit{font-family:"Space Mono",monospace; font-size:10px; letter-spacing:.2em; color:var(--mute)}
+.st-fig{width:min(40vw,150px); height:min(40vw,150px); flex:none}
+.stage[data-phase="work"] .st-fig{width:76px; height:76px}
+.stage[data-phase="work"] .ringwrap{width:min(48vw,185px)}
 .stname{font-family:"Hahmlet",serif; font-weight:800; font-size:clamp(23px,6.6vw,32px); line-height:1.22;
   max-width:16ch}
 .stcue{font-size:13.5px; color:var(--ink2); max-width:30ch}
@@ -377,10 +436,32 @@ img{max-width:100%}
   </div>
 </div>
 
+<!-- ── 동작 설명 ── -->
+<div class="sheet" id="sheet" hidden>
+  <div class="in">
+    <div class="sh-top"><span class="lbl" id="shPart"></span>
+      <button class="sh-x" id="shClose" aria-label="닫기">✕ CLOSE</button></div>
+    <div class="sh-fig" id="shFig"></div>
+    <h2 class="sh-name" id="shName"></h2>
+    <p class="sh-tags" id="shTags"></p>
+    <p class="sh-cue" id="shCue"></p>
+    <div class="headrow"><span class="lbl">이렇게 한다</span></div>
+    <ol class="steps" id="shSteps"></ol>
+    <p class="sh-bad" id="shBad"></p>
+    <div class="headrow"><span class="lbl">바꿔서 해도 돼요</span></div>
+    <div class="alts" id="shAlts"></div>
+    <div class="sh-acts">
+      <button class="go" id="shSwap" hidden></button>
+      <a id="shVid" target="_blank" rel="noopener">영상으로 보기 ↗</a>
+    </div>
+  </div>
+</div>
+
 <!-- ── 타이머 ── -->
 <div class="stage" id="stage" hidden data-phase="prep">
   <div class="sttop"><span class="ph" id="stPhase">준비</span><span class="rd" id="stRound"></span></div>
   <div class="stmid">
+    <div class="st-fig" id="stFig"></div>
     <div class="ringwrap">
       <svg class="ring" viewBox="0 0 240 240" aria-hidden="true">
         <circle class="tr" cx="120" cy="120" r="110"></circle>
@@ -499,6 +580,226 @@ const RAW=[
 ];
 const EX=RAW.map(r=>({id:r[0],name:r[1],part:r[2],gear:r[3],style:r[4],lv:r[5],unit:r[6],cue:r[7],quiet:!!r[8]}));
 const byId=Object.fromEntries(EX.map(e=>[e.id,e]));
+
+/* ── 막대 인형 ──
+   동작을 글로만 적어 두면 무슨 동작인지 알 수 없다. 관절 각도만으로 사람을 그려
+   '시작 자세(흐린 선)'와 '끝 자세(진한 선)'를 겹쳐 보여 준다.
+   자세 = [보기, 몸통, 허벅지, 정강이, 반대허벅지, 반대정강이, 위팔, 아래팔, 띄움, 좌우뒤집기]
+   보기 0=옆에서 1=앞에서 · 각도는 도(°), +는 바라보는 쪽(오른쪽), 몸통 0=곧게 섬 */
+const SEG={torso:26,thigh:21,shank:21,ua:15,fa:14,neck:6,head:6.6};
+const FIG={
+  stand:[[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]],
+  squat:[[0,5,0,0,0,0,12,12,0],[0,32,78,-40,78,-40,80,78,0]],
+  lunge:[[0,0,0,0,0,0,0,0,0],[0,8,45,-15,-30,-70,10,10,0]],
+  sidelunge:[[0,0,18,-18,-18,18,5,5,0],[0,12,55,-15,-55,15,60,60,0]],
+  bulgarian:[[0,0,5,-5,-25,-70,0,0,0],[0,14,48,-18,-30,-80,12,12,0]],
+  hinge:[[0,0,0,0,0,0,0,0,0],[0,68,0,0,0,0,0,0,0]],
+  bridge:[[0,-90,125,25,125,25,88,88,0],[0,-72,112,12,112,12,80,84,0]],
+  calf:[[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,7]],
+  wallsit:[[0,0,85,0,85,0,60,60,0],[0,0,85,0,85,0,60,60,0]],
+  stepup:[[0,0,0,0,0,0,10,10,0],[0,14,60,-20,-8,0,25,25,0]],
+  pushup:[[0,90,-90,-90,-90,-90,0,0,0],[0,90,-90,-90,-90,-90,-28,28,0]],
+  kneepush:[[0,80,-80,-35,-80,-35,0,0,0],[0,80,-80,-35,-80,-35,-28,28,0]],
+  incline:[[0,72,-72,-72,-72,-72,0,0,0],[0,72,-72,-72,-72,-72,-25,25,0]],
+  pike:[[0,55,-60,-60,-60,-60,0,0,0],[0,55,-60,-60,-60,-60,-30,30,0]],
+  dip:[[0,-5,82,-8,82,-8,-12,-12,0],[0,-5,82,-8,82,-8,-42,8,0]],
+  superman:[[0,92,-92,-92,-92,-92,88,88,0],[0,84,-102,-110,-102,-110,100,100,0]],
+  row:[[0,60,5,-5,5,-5,0,0,0],[0,60,5,-5,5,-5,-28,-38,0]],
+  plank:[[0,90,-90,-90,-90,-90,10,85,0],[0,90,-90,-90,-90,-90,10,85,0]],
+  deadbug:[[0,-90,125,25,125,25,-92,-92,0],[0,-90,125,25,96,96,-60,-60,0]],
+  birddog:[[0,90,0,-90,0,-90,0,0,0],[0,90,0,-90,-95,-95,110,110,0]],
+  hollow:[[0,-90,98,98,98,98,-92,-92,0],[0,-90,108,108,108,108,-104,-104,0]],
+  crunch:[[0,-90,125,25,125,25,120,120,0],[0,-55,125,25,125,25,110,120,0]],
+  legraise:[[0,-90,96,96,96,96,88,88,0],[0,-90,145,145,145,145,88,88,0]],
+  twist:[[0,-35,90,-25,90,-25,70,70,0],[0,-35,90,-25,90,-25,118,118,0]],
+  mtclimber:[[0,90,-90,-90,-90,-90,0,0,0],[0,90,-40,-15,-90,-90,0,0,0]],
+  jack:[[1,0,5,0,0,0,6,6,0],[1,0,30,0,0,0,160,170,4]],
+  highknee:[[0,0,0,0,0,0,-20,20,0],[0,5,110,20,-10,-5,-30,30,4]],
+  burpee:[[0,0,0,0,0,0,0,0,0],[0,90,-90,-90,-90,-90,0,0,0]],
+  jump:[[0,25,60,-50,60,-50,50,50,0],[0,0,-15,15,-15,15,170,175,11]],
+  skater:[[0,15,30,-25,-50,70,40,50,0],[0,15,30,-25,-50,70,40,50,0,1]],
+  tuck:[[0,10,40,-35,40,-35,40,40,0],[0,0,120,40,120,40,150,160,13]],
+  press:[[0,0,0,0,0,0,140,120,0],[0,0,0,0,0,0,175,178,0]],
+  curl:[[0,0,0,0,0,0,5,5,0],[0,0,0,0,0,0,10,130,0]],
+  lateral:[[1,0,5,0,0,0,5,5,0],[1,0,5,0,0,0,82,86,0]],
+  thruster:[[0,25,70,-55,70,-55,150,128,0],[0,0,0,0,0,0,175,178,0]],
+  swing:[[0,60,10,-10,10,-10,-30,-20,0],[0,0,0,0,0,0,80,85,0]],
+  floorpress:[[0,-90,125,25,125,25,-50,-88,0],[0,-90,125,25,125,25,-88,-90,0]],
+  bear:[[0,90,-10,-80,-10,-80,0,0,0],[0,90,-10,-80,-10,-80,0,0,0]],
+  crab:[[0,-70,110,15,110,15,-30,-10,0],[0,-70,110,15,110,15,-30,-10,0]],
+  beastcrab:[[0,90,-10,-80,-10,-80,0,0,0],[0,-70,110,15,110,15,-30,-10,0]],
+  dogflow:[[0,55,-60,-60,-60,-60,0,0,0],[0,112,-95,-95,-95,-95,0,0,0]],
+  catcow:[[0,86,0,-90,0,-90,0,0,0],[0,104,6,-84,6,-84,0,0,0]],
+  hip90:[[0,-12,88,-62,88,-62,45,45,0],[0,-12,88,-62,88,-62,45,45,0,1]],
+  carry:[[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]],
+  box:[[0,0,10,-5,-15,10,20,140,0],[0,6,10,-5,-15,10,80,95,0]],
+  monster:[[1,0,20,0,0,0,30,40,0],[1,0,38,0,0,0,30,40,0]],
+  scorpion:[[0,90,-90,-90,-90,-90,0,0,0],[0,90,-55,-95,-90,-90,0,0,0]],
+  pull:[[0,0,0,0,0,0,170,175,0],[0,0,0,0,0,0,120,150,0]],
+  chest:[[0,0,0,0,0,0,78,125,0],[0,0,0,0,0,0,84,88,0]],
+  tri:[[0,0,0,0,0,0,175,118,0],[0,0,0,0,0,0,175,178,0]],
+  apart:[[1,0,5,0,0,0,30,40,0],[1,0,5,0,0,0,85,88,0]],
+};
+/* 어떤 동작이 어떤 그림을 쓰는가 — 같은 움직임이면 그림을 나눠 쓴다 */
+const FIGOF={
+  squat:"squat",backlunge:"lunge",sidelunge:"sidelunge",bulgarian:"bulgarian",hinge:"hinge",
+  bridge:"bridge",sglbridge:"bridge",calf:"calf",wallsit:"wallsit",stepup:"stepup",cossack:"sidelunge",
+  pushup:"pushup",kneepush:"kneepush",incline:"incline",pike:"pike",diamond:"pushup",dip:"dip",
+  superman:"superman",snowangel:"superman",towelrow:"row",
+  plank:"plank",sideplank:"plank",deadbug:"deadbug",birddog:"birddog",hollow:"hollow",crunch:"crunch",
+  legraise:"legraise",twist:"twist",shouldertap:"plank",mtclimber:"mtclimber",
+  jack:"jack",stepjack:"jack",highknee:"highknee",marching:"highknee",burpee:"burpee",
+  squatthrust:"burpee",shadowbox:"box",sprint:"highknee",
+  jumpsquat:"jump",jumplunge:"lunge",skater:"skater",tuckjump:"tuck",broad:"jump",boxjump:"stepup",
+  plyopush:"pushup",powerskip:"highknee",
+  bsquat:"squat",bgm:"hinge",bmonster:"monster",bthrust:"bridge",bdead:"hinge",brow:"row",
+  bpull:"pull",bpress:"press",bchest:"chest",bcurl:"curl",btri:"tri",bapart:"apart",
+  dgoblet:"squat",dlunge:"lunge",drdl:"hinge",dthruster:"thruster",dswing:"swing",dpress:"press",
+  drow:"row",dfloor:"floorpress",dcurl:"curl",dlateral:"lateral",drenegade:"plank",dcarry:"carry",
+  dstepup:"stepup",
+  bearhold:"bear",bearcrawl:"bear",crabhold:"crab",crabreach:"crab",beast2crab:"beastcrab",
+  scorpion:"scorpion",underswitch:"bear",dogflow:"dogflow",catcow:"catcow",worldgreat:"lunge",
+  hip9090:"hip90",thoracic:"catcow",
+};
+/* 각도 → 관절 위치. 골반을 (0,0)으로 두고 잰 뒤, 나중에 통째로 옮겨 자리를 잡는다. */
+function figJoints(p){
+  const rad=a=>a*Math.PI/180;
+  const lim=(from,a,len)=>[from[0]+Math.sin(rad(a))*len, from[1]+Math.cos(rad(a))*len];
+  const front=p[0]===1, t=p[1];
+  const td=[Math.sin(rad(t)),-Math.cos(rad(t))];
+  const pel=[0,0];
+  const sh=[td[0]*SEG.torso, td[1]*SEG.torso];
+  const hd=[sh[0]+td[0]*SEG.neck, sh[1]+td[1]*SEG.neck];
+  const th=p[2], sk=p[3], th2=front?-p[2]:p[4], sk2=front?-p[3]:p[5], ua=p[6], fa=p[7];
+  const kn=lim(pel,th,SEG.thigh), ft=lim(kn,sk,SEG.shank);
+  const kn2=lim(pel,th2,SEG.thigh), ft2=lim(kn2,sk2,SEG.shank);
+  const el=lim(sh,ua,SEG.ua), wr=lim(el,fa,SEG.fa);
+  const el2=front?lim(sh,-ua,SEG.ua):null, wr2=front?lim(el2,-fa,SEG.fa):null;
+  return {pel,sh,hd,kn,ft,kn2,ft2,el,wr,el2,wr2,flip:p[9]===1,lift:p[8]||0};
+}
+function figParts(j,gear){
+  const L=(a,b)=>`<path class="st" d="M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}"/>`;
+  let g=`<circle class="hd" cx="${j.hd[0].toFixed(1)}" cy="${j.hd[1].toFixed(1)}" r="${SEG.head}"/>`
+    +L(j.sh,j.pel)+L(j.pel,j.kn)+L(j.kn,j.ft)+L(j.pel,j.kn2)+L(j.kn2,j.ft2)+L(j.sh,j.el)+L(j.el,j.wr);
+  if(j.el2)g+=L(j.sh,j.el2)+L(j.el2,j.wr2);
+  const bar=w=>`<path class="pr" d="M${(w[0]-6).toFixed(1)} ${w[1].toFixed(1)}L${(w[0]+6).toFixed(1)} ${w[1].toFixed(1)}"/>`;
+  if(gear==="db"){ g+=bar(j.wr); if(j.wr2)g+=bar(j.wr2); }
+  if(gear==="band")g+=`<path class="bd" d="M${j.wr[0].toFixed(1)} ${j.wr[1].toFixed(1)}L${j.ft[0].toFixed(1)} ${j.ft[1].toFixed(1)}"/>`;
+  return g;
+}
+function figPts(j){
+  const a=[j.pel,j.sh,j.hd,j.kn,j.ft,j.kn2,j.ft2,j.el,j.wr];
+  if(j.el2)a.push(j.el2,j.wr2);
+  return a;
+}
+/* 두 자세를 한 그림에 겹쳐 그린다 — 자리는 두 자세를 합쳐 한 번만 잡는다 */
+function figSVG(id,cls){
+  const pair=FIG[FIGOF[id]||"stand"]||FIG.stand;
+  const gear=(byId[id]||{}).gear||"none";
+  const J=[figJoints(pair[0]),figJoints(pair[1])];
+  const local=J.map(j=>figPts(j).map(pt=>[j.flip?-pt[0]:pt[0],pt[1]-j.lift]));
+  const all=local[0].concat(local[1]);
+  const xs=all.map(p=>p[0]), ys=all.map(p=>p[1]);
+  const minX=Math.min.apply(null,xs), maxX=Math.max.apply(null,xs);
+  const minY=Math.min.apply(null,ys), maxY=Math.max.apply(null,ys);
+  const scale=Math.min(1,84/Math.max(maxX-minX+SEG.head*2,maxY-minY+SEG.head*2));
+  const tx=50-((minX+maxX)/2)*scale;
+  /* 높이는 자세마다 따로 맞춘다 — 그래야 앉은 자세는 낮게, 선 자세는 높게 보인다 */
+  const tys=local.map(pt=>93-Math.max.apply(null,pt.map(q=>q[1]))*scale);
+  // 변환은 오른쪽부터 적용된다 — 좌우뒤집기 → 띄움 → 크기 → 자리
+  const grp=(j,k,ty)=>`<g class="${k}" transform="translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${scale.toFixed(3)}) translate(0 ${(-j.lift).toFixed(1)})${j.flip?" scale(-1 1)":""}">${figParts(j,gear)}</g>`;
+  return `<svg class="fig${cls?" "+cls:""}" viewBox="0 0 100 100" aria-hidden="true">`
+    +`<path class="gd" d="M8 94L92 94"/>`+grp(J[0],"f0",tys[0])+grp(J[1],"f1",tys[1])+`</svg>`;
+}
+
+/* ── 하는 법 ──
+   이름만 봐서는 어떤 동작인지 알 수 없으니, 동작마다 순서 2~3단계와
+   가장 흔한 실수를 적어 둔다. [단계들, 자주 하는 실수] */
+const HOW={
+  squat:[["발을 어깨너비로, 발끝은 살짝 바깥으로","가슴을 편 채 엉덩이를 뒤로 빼며 앉는다","허벅지가 바닥과 나란해지면 발바닥 전체로 밀며 선다"],"무릎이 안쪽으로 모이거나 뒤꿈치가 뜨는 것"],
+  backlunge:[["한 발을 뒤로 크게 내딛는다","뒷무릎이 바닥에 닿기 직전까지 곧게 내린다","앞발로 밀어 제자리로 — 반대쪽도 같게"],"상체가 앞으로 무너지는 것"],
+  sidelunge:[["두 발을 넓게 벌리고 선다","한쪽 무릎만 굽히며 그쪽으로 체중을 옮긴다","반대 다리는 편 채, 발바닥으로 밀어 돌아온다"],"굽힌 쪽 무릎이 발끝보다 안으로 들어가는 것"],
+  bulgarian:[["뒷발등을 의자에 올리고 앞발은 한 걸음 앞에","앞다리로만 앉듯 내려간다","앞발 뒤꿈치로 밀어 올라온다"],"앞발이 너무 가까워 무릎만 접히는 것"],
+  hinge:[["무릎을 살짝만 굽히고 선다","가슴을 편 채 엉덩이를 뒤로 밀며 상체를 숙인다","엉덩이를 조이며 일어선다"],"허리를 둥글게 말아 숙이는 것"],
+  bridge:[["누워 무릎을 세우고 발은 엉덩이 가까이","엉덩이를 조이며 골반을 천장으로 올린다","위에서 1초 멈췄다 천천히 내린다"],"허리를 젖혀 올리는 것"],
+  sglbridge:[["브리지 자세에서 한 다리를 들어 올린다","디딘 다리로만 골반을 올린다","골반이 기울지 않게 유지하며 내린다"],"골반이 한쪽으로 기우는 것"],
+  calf:[["발끝으로 천천히 최대한 올라간다","맨 위에서 2초 버틴다","뒤꿈치가 닿기 직전까지 천천히 내린다"],"반동으로 통통 튀는 것"],
+  wallsit:[["벽에 등을 붙이고 발을 한 걸음 앞으로","무릎이 90도가 되도록 미끄러지듯 앉는다","숨을 쉬며 그대로 버틴다"],"무릎이 발끝보다 많이 나가는 것"],
+  stepup:[["의자·계단 앞에 서서 한 발을 올린다","올린 다리 힘으로 몸을 세운다","같은 발로 천천히 내려온다"],"바닥 발로 통통 뛰어 올라가는 것"],
+  cossack:[["다리를 아주 넓게 벌리고 선다","한쪽으로 깊게 앉고 반대 다리는 쭉 편다","발바닥으로 밀어 반대쪽으로 옮겨간다"],"허리를 굽혀 균형을 잡는 것"],
+  pushup:[["손을 어깨너비보다 조금 넓게 짚는다","머리부터 발끝까지 한 줄을 유지하며 내려간다","가슴이 바닥에 가까워지면 밀어 올린다"],"허리가 꺼지거나 엉덩이가 솟는 것"],
+  kneepush:[["무릎을 대고 발을 들어 올린다","어깨부터 무릎까지 곧게 유지하며 내려간다","팔로 밀어 올라온다"],"엉덩이가 뒤로 빠져 몸이 접히는 것"],
+  incline:[["책상·의자에 손을 어깨너비로 짚는다","몸을 곧게 편 채 가슴을 손 높이로 내린다","밀어 올린다"],"목만 먼저 내려가는 것"],
+  pike:[["엎드려 엉덩이를 최대한 높이 든다","정수리가 바닥을 향하도록 팔을 굽힌다","어깨 힘으로 밀어 올린다"],"팔꿈치가 옆으로 크게 벌어지는 것"],
+  diamond:[["두 손을 모아 엄지·검지로 삼각형을 만든다","팔꿈치를 몸에 붙인 채 내려간다","삼두에 힘을 주며 밀어 올린다"],"팔꿈치가 벌어져 일반 푸시업이 되는 것"],
+  dip:[["의자 끝을 잡고 엉덩이를 앞으로 뺀다","팔꿈치를 뒤로 굽혀 90도까지 내려간다","팔로 밀어 올라온다"],"어깨가 귀 쪽으로 솟는 것"],
+  superman:[["엎드려 팔을 앞으로 뻗는다","팔·가슴·다리를 동시에 들어 올린다","등을 조인 채 버틴다"],"목을 꺾어 위를 보는 것"],
+  snowangel:[["엎드려 팔을 몸 옆에 둔다","팔을 바닥에 스치듯 머리 위까지 크게 돌린다","같은 길로 천천히 돌아온다"],"팔을 높이 들어 어깨로만 도는 것"],
+  towelrow:[["수건 양 끝을 잡고 팔을 앞으로 뻗는다","바깥으로 당기며 견갑을 모은다","5초 버티고 천천히 푼다"],"어깨를 으쓱 올리는 것"],
+  plank:[["팔꿈치를 어깨 아래에 두고 엎드린다","배와 엉덩이에 힘을 줘 몸을 한 줄로 만든다","숨을 쉬며 버틴다"],"허리가 꺼지거나 엉덩이가 솟는 것"],
+  sideplank:[["옆으로 누워 팔꿈치를 어깨 아래에 둔다","골반을 천장 쪽으로 밀어 올린다","몸을 한 줄로 유지하며 버틴다"],"골반이 뒤로 빠지는 것"],
+  deadbug:[["누워 팔을 천장으로, 무릎을 90도로 든다","허리를 바닥에 붙인 채 반대 팔다리를 뻗는다","천천히 제자리로 — 반대쪽도 같게"],"허리가 바닥에서 뜨는 것"],
+  birddog:[["네발로 엎드린다","반대쪽 팔과 다리를 동시에 뻗는다","1초 멈췄다 돌아온다"],"골반이 좌우로 흔들리는 것"],
+  hollow:[["누워 허리를 바닥에 꾹 붙인다","팔과 다리를 바닥에서 조금만 띄운다","그 상태로 버틴다"],"허리가 떠서 아치가 생기는 것"],
+  crunch:[["무릎을 세우고 눕는다","턱은 살짝 당긴 채 배로 상체를 말아 올린다","천천히 내린다"],"손으로 목을 당기는 것"],
+  legraise:[["누워 손을 엉덩이 옆에 둔다","다리를 곧게 들어 올린다","바닥에 닿기 직전까지 천천히 내린다"],"내릴 때 허리가 뜨는 것"],
+  twist:[["앉아서 무릎을 굽히고 상체를 살짝 뒤로","가슴을 편 채 몸통을 한쪽으로 돌린다","좌우로 번갈아 돌린다"],"팔만 좌우로 흔드는 것"],
+  shouldertap:[["푸시업 자세로 버틴다","한 손으로 반대쪽 어깨를 터치한다","골반이 흔들리지 않게 번갈아"],"엉덩이가 좌우로 크게 흔들리는 것"],
+  mtclimber:[["푸시업 자세를 잡는다","한 무릎을 가슴 쪽으로 당긴다","발을 바꿔 가며 빠르게 반복"],"엉덩이가 위로 솟는 것"],
+  jack:[["차렷 자세로 선다","점프하며 팔은 머리 위로, 다리는 옆으로 벌린다","다시 모으며 착지"],"팔을 어깨 높이까지만 드는 것"],
+  stepjack:[["차렷 자세로 선다","한 발씩 옆으로 내디디며 팔을 머리 위로","번갈아 반복 — 뛰지 않는다"],"팔 동작을 생략하는 것"],
+  highknee:[["제자리에서 가볍게 뛴다","무릎을 배꼽 높이까지 번갈아 올린다","팔도 함께 흔든다"],"상체가 뒤로 젖혀지는 것"],
+  marching:[["제자리에서 걷듯 무릎을 올린다","팔을 크게 흔든다","숨을 고르며 리듬을 유지한다"],"발만 움직이고 몸은 굳어 있는 것"],
+  burpee:[["선 자세에서 손을 바닥에 짚는다","다리를 뒤로 뻗어 엎드린다","다시 당겨 일어서며 점프"],"엎드릴 때 허리가 꺼지는 것"],
+  squatthrust:[["손을 바닥에 짚고 다리를 뒤로 뻗는다","다시 발을 손 옆으로 당긴다","점프 없이 일어선다"],"엉덩이를 높이 든 채 발만 옮기는 것"],
+  shadowbox:[["발을 앞뒤로 두고 가드를 올린다","허리 회전으로 주먹을 뻗는다","곧바로 가드로 되돌린다"],"팔로만 치고 가드를 내리는 것"],
+  sprint:[["상체를 살짝 앞으로 기울인다","발을 최대한 빠르게 굴린다","팔도 크게 흔든다"],"보폭만 크고 속도는 느린 것"],
+  jumpsquat:[["스쿼트로 앉는다","폭발적으로 뛰어오른다","무릎을 굽히며 소리 없이 착지"],"무릎을 편 채 쿵 착지하는 것"],
+  jumplunge:[["런지 자세를 잡는다","뛰어올라 공중에서 앞뒤 발을 바꾼다","부드럽게 착지해 이어간다"],"상체가 좌우로 흔들리는 것"],
+  skater:[["한 발로 서고 반대 발은 뒤로 교차","옆으로 멀리 건너뛴다","한 발로 균형을 잡고 바로 반대쪽으로"],"거의 제자리에서 통통 뛰는 것"],
+  tuckjump:[["살짝 앉았다 뛰어오른다","공중에서 무릎을 가슴까지 당긴다","무릎을 굽히며 착지"],"무릎 대신 발만 뒤로 접는 것"],
+  broad:[["두 발로 서서 팔을 뒤로 뺀다","팔을 휘두르며 앞으로 멀리 뛴다","앉듯이 착지하고 걸어서 돌아온다"],"착지할 때 무릎이 안으로 모이는 것"],
+  boxjump:[["낮은 계단 앞에 선다","두 발로 뛰어 올라선다","내려올 때는 뛰지 말고 걸어서"],"높은 곳에서 뛰어내리는 것"],
+  plyopush:[["푸시업 자세로 내려간다","손이 바닥에서 떨어질 만큼 세게 민다","부드럽게 받아 다시 내려간다"],"팔로만 튀기고 몸이 꺾이는 것"],
+  powerskip:[["제자리에서 한쪽 무릎을 높이 든다","반대 팔을 함께 올리며 크게 스킵","좌우 번갈아"],"낮게 종종거리는 것"],
+  bsquat:[["밴드 가운데를 밟고 양 끝을 어깨에 건다","장력을 느끼며 앉는다","밀어 올리며 일어선다"],"밴드가 느슨해질 만큼만 앉는 것"],
+  bgm:[["밴드를 밟고 목 뒤에 건다","무릎은 살짝, 엉덩이를 뒤로 밀며 숙인다","엉덩이를 조이며 일어선다"],"허리를 말아 숙이는 것"],
+  bmonster:[["밴드를 무릎 위에 걸고 반쯤 앉는다","무릎을 밖으로 밀며 옆으로 걷는다","반대 방향으로도 같게"],"무릎이 안으로 모여 밴드가 느슨해지는 것"],
+  bthrust:[["누워 무릎을 세우고 골반 위로 밴드를 건다","엉덩이를 끝까지 조이며 올린다","천천히 내린다"],"허리를 젖혀 올리는 것"],
+  bdead:[["밴드 가운데를 밟고 양 끝을 잡는다","허리를 곧게 편 채 숙였다가","엉덩이 힘으로 서며 밴드를 당긴다"],"팔로 당겨 올리는 것"],
+  brow:[["밴드를 발이나 기둥에 걸고 양 끝을 잡는다","팔꿈치를 몸 뒤까지 당긴다","견갑을 모았다가 천천히 푼다"],"어깨를 으쓱 올리는 것"],
+  bpull:[["밴드를 머리 위에서 양손으로 잡는다","팔을 벌리며 가슴 쪽으로 내려 당긴다","천천히 되돌린다"],"팔꿈치가 앞으로 말리는 것"],
+  bpress:[["밴드를 밟고 양 끝을 어깨 높이로 잡는다","머리 위로 곧게 밀어 올린다","천천히 어깨로 내린다"],"허리를 젖혀 반동으로 미는 것"],
+  bchest:[["밴드를 등 뒤로 두르고 겨드랑이 옆에서 잡는다","가슴 앞으로 밀어낸다","천천히 되돌린다"],"팔꿈치가 어깨보다 뒤로 빠지는 것"],
+  bcurl:[["밴드를 밟고 손바닥이 앞을 보게 잡는다","팔꿈치를 옆구리에 붙인 채 손만 올린다","천천히 내린다"],"팔꿈치가 앞뒤로 움직이는 것"],
+  btri:[["밴드를 등 뒤로 잡고 한 손은 머리 위로","팔꿈치를 고정한 채 팔만 편다","천천히 굽힌다"],"팔꿈치가 옆으로 벌어지는 것"],
+  bapart:[["밴드를 가슴 앞에서 양손으로 잡는다","팔을 편 채 좌우로 벌린다","견갑을 모았다 천천히 푼다"],"팔꿈치를 굽혀 당기는 것"],
+  dgoblet:[["덤벨을 가슴 앞에 세워 안는다","상체를 세운 채 앉는다","발바닥으로 밀며 일어선다"],"무게에 끌려 상체가 앞으로 기우는 것"],
+  dlunge:[["양손에 덤벨을 들고 선다","한 발을 뒤로 내디디며 앉는다","앞발로 밀어 제자리로"],"덤벨을 몸에서 멀리 떨어뜨리는 것"],
+  drdl:[["덤벨을 허벅지 앞에 두고 선다","무릎은 살짝, 정강이를 스치듯 내린다","엉덩이로 밀며 일어선다"],"덤벨이 몸에서 멀어지는 것"],
+  dthruster:[["덤벨을 어깨에 얹고 앉는다","일어서는 힘으로 그대로 머리 위까지 민다","어깨로 내리며 바로 다음 반복"],"앉기와 밀기를 끊어서 하는 것"],
+  dswing:[["덤벨을 두 손으로 잡고 다리 사이로 보낸다","엉덩이를 튕기며 가슴 높이까지 올린다","다시 다리 사이로 통과시킨다"],"팔로 들어 올리는 것"],
+  dpress:[["덤벨을 어깨 높이로 든다","배에 힘을 주고 머리 위로 민다","천천히 어깨로 내린다"],"갈비뼈가 벌어지며 허리가 젖혀지는 것"],
+  drow:[["상체를 45도 숙이고 덤벨을 늘어뜨린다","팔꿈치를 허리 쪽으로 당긴다","천천히 내린다"],"상체를 일으키며 반동으로 당기는 것"],
+  dfloor:[["누워 덤벨을 가슴 옆에 든다","팔꿈치가 바닥에 닿을 때까지 내린다","위로 밀어 올린다"],"팔꿈치를 어깨와 직각으로 벌리는 것"],
+  dcurl:[["팔을 편 채 덤벨을 들고 선다","팔꿈치를 붙이고 손만 올린다","3초에 걸쳐 내린다"],"몸을 흔들어 반동으로 올리는 것"],
+  dlateral:[["덤벨을 몸 옆에 들고 선다","팔을 어깨 높이까지 옆으로 든다","천천히 내린다"],"무거워서 던지듯 들어 올리는 것"],
+  drenegade:[["덤벨을 잡고 푸시업 자세를 만든다","한쪽 덤벨을 허리로 당긴다","골반을 고정한 채 번갈아"],"골반이 좌우로 크게 흔들리는 것"],
+  dcarry:[["양손에 덤벨을 들고 선다","어깨를 펴고 배에 힘을 준다","자세를 유지한 채 버틴다"],"어깨가 앞으로 말리는 것"],
+  dstepup:[["덤벨을 들고 계단 앞에 선다","한 발로 올라선다","같은 발로 천천히 내려온다"],"반동으로 뛰어 올라가는 것"],
+  bearhold:[["네발로 엎드려 손은 어깨 아래, 무릎은 골반 아래","발끝으로 무릎을 바닥에서 5cm 띄운다","등을 평평하게 유지하며 버틴다"],"엉덩이를 높이 들어 쉬는 것"],
+  bearcrawl:[["베어 자세로 무릎을 띄운다","반대쪽 손과 발을 함께 조금씩 옮긴다","등이 흔들리지 않게 낮게 유지"],"엉덩이가 좌우로 출렁이는 것"],
+  crabhold:[["앉아서 손은 엉덩이 뒤, 무릎은 세운다","엉덩이를 들어 어깨-무릎을 평평하게","가슴을 열고 버틴다"],"엉덩이가 바닥으로 처지는 것"],
+  crabreach:[["크랩 자세로 엉덩이를 든다","한 손을 반대쪽 발끝 위로 크게 뻗는다","제자리로 돌아와 번갈아"],"엉덩이를 내린 채 팔만 뻗는 것"],
+  beast2crab:[["베어 자세에서 한 손을 뗀다","몸을 돌려 크랩 자세로 넘어간다","다시 돌려 베어로 — 좌우 번갈아"],"무릎을 바닥에 대고 도는 것"],
+  scorpion:[["푸시업 자세로 버틴다","한 다리를 들어 반대쪽 바닥으로 크게 통과시킨다","제자리로 돌아와 번갈아"],"골반만 비틀고 다리는 짧게 도는 것"],
+  underswitch:[["베어 자세에서 한 손과 반대 발을 든다","다리를 몸 아래로 밀어 넣으며 골반을 돌린다","반쯤 앉은 자세로 바꿨다가 되돌아온다"],"무릎이 바닥에 닿는 것"],
+  dogflow:[["엎드려 엉덩이를 높이 들어 다운독","가슴을 앞으로 통과시키며 업독으로","숨에 맞춰 천천히 오간다"],"어깨를 귀에 붙인 채 미는 것"],
+  catcow:[["네발로 엎드린다","숨을 내쉬며 등을 둥글게 만다","들이쉬며 가슴을 열고 젖힌다"],"목만 위아래로 움직이는 것"],
+  worldgreat:[["한 발을 크게 앞으로 내딛는다","같은 쪽 팔꿈치를 발 안쪽 바닥으로 내린다","그 팔을 천장으로 열며 가슴을 돌린다"],"뒷무릎을 바닥에 대고 쉬는 것"],
+  hip9090:[["앉아서 무릎을 90도로 좌우에 놓는다","무릎을 들어 반대쪽으로 넘긴다","손은 짚어도 되고, 좌우 번갈아"],"허리를 비틀어 넘기는 것"],
+  thoracic:[["네발에서 한 손을 머리 뒤에 댄다","팔꿈치를 바닥 쪽으로 감았다가","천장으로 크게 열며 가슴을 돌린다"],"허리로 회전하는 것"],
+};
 
 /* 목표 — 어떻게 운동하는가(원리)와 그에 맞는 인터벌·부위 차례 */
 const GOALS={
@@ -702,8 +1003,9 @@ function renderRoutine(){
   $("rRail").innerHTML=rail;
   $("rMoves").innerHTML=routine.moves.map((e,i)=>
     '<li><span class="no">'+String(i+1).padStart(2,"0")+"</span>"+
-    '<span class="body"><span class="nm">'+e.name+"</span>"+
-    '<span class="cue">'+e.cue+"</span></span>"+
+    '<button class="thumb" data-see="'+e.id+'" data-slot="'+i+'" aria-label="'+e.name+' 설명 보기">'+figSVG(e.id)+"</button>"+
+    '<button class="body" data-see="'+e.id+'" data-slot="'+i+'" style="text-align:left"><span class="nm">'+e.name+"</span>"+
+    '<span class="cue">'+e.cue+"</span></button>"+
     '<span class="side"><span class="sec">'+routine.work+"″</span>"+
     '<span class="part">'+e.part+(e.gear!=="none"?' <em>'+gearName(e.gear)+"</em>":"")+"</span>"+
     '<button class="swap" data-swap="'+i+'">바꾸기</button></span></li>').join("");
@@ -733,8 +1035,9 @@ function renderLib(){
   $("libFilter").innerHTML=["전체",P.L,P.U,P.C,P.F,"밴드","덤벨","의자","플라이오","플로우"].map(k=>
     '<button data-lib="'+k+'" aria-pressed="'+(f===k)+'">'+k+"</button>").join("");
   $("libList").innerHTML=list.map(e=>
-    '<div class="it"><span class="bd"><b>'+e.name+"</b>"+
-    '<span class="cue">'+e.cue+"</span></span>"+
+    '<div class="it"><span class="thumb">'+figSVG(e.id)+"</span>"+
+    '<button class="bd" data-see="'+e.id+'" style="text-align:left"><b>'+e.name+"</b>"+
+    '<span class="cue">'+e.cue+"</span></button>"+
     '<span class="meta">'+"●".repeat(e.lv)+"○".repeat(3-e.lv)+
     "<em>"+e.part+(e.gear!=="none"?" · "+gearName(e.gear):"")+"</em>"+
     (e.unit==="time"?"TIME":"REPS")+"</span></div>").join("")||
@@ -854,6 +1157,9 @@ function draw(){
   $("stClock").textContent=Math.max(0,Math.ceil(left));
   $("ringPr").setAttribute("stroke-dashoffset",RING*(1-Math.max(0,Math.min(1,left/s.sec))));
   const ex=s.ex;
+  const figId=ex?ex.id:"";
+  if($("stFig").dataset.id!==figId){ $("stFig").dataset.id=figId;
+    $("stFig").innerHTML=ex?figSVG(ex.id,"play"):""; }
   if(s.t==="work"&&ex){
     $("stUnit").textContent="SEC";
     $("stMove").textContent=ex.name;
@@ -864,7 +1170,11 @@ function draw(){
   }else{
     $("stUnit").textContent="SEC";
     $("stMove").textContent=s.t==="prep"?"곧 시작합니다":"쉬는 중";
-    $("stCue").textContent=s.t==="prep"?"자리를 잡고 숨을 고르세요":"숨을 길게 내쉬세요";
+    // 쉬는 동안 다음 동작의 첫 순서를 미리 읽어 둘 수 있게
+    const nh=ex&&HOW[ex.id]?HOW[ex.id][0][0]:"";
+    $("stCue").textContent=s.t==="prep"
+      ? (nh||"자리를 잡고 숨을 고르세요")
+      : (nh?"다음 — "+nh:"숨을 길게 내쉬세요");
     $("stNext").textContent=ex?"NEXT · "+ex.name:"";
   }
   let total=0, past=0;
@@ -876,7 +1186,7 @@ function draw(){
 function finish(partial){
   if(tick)clearInterval(tick); tick=null;
   try{ if(lock){ lock.release(); lock=null; } }catch(e){}
-  $("stage").hidden=true; document.body.style.overflow="";
+  $("stage").hidden=true; if($("sheet").hidden)document.body.style.overflow="";
   let done=0; for(let i=0;i<=Math.min(si,steps.length-1);i++)done+=steps[i].sec;
   const min=Math.max(1,Math.round(done/60));
   if(!partial||min>=2){
@@ -893,6 +1203,49 @@ function finish(partial){
     "동작 × "+routine.rounds+"R</span></div>";
   setTimeout(()=>{ $("doneSlot").innerHTML=""; },12000);
 }
+
+/* ── 동작 설명 ──
+   이름만으로는 무슨 동작인지 알 수 없다. 그림(두 자세를 번갈아)과 순서, 흔한 실수,
+   바꿔 할 수 있는 동작, 영상 검색을 한 화면에 모은다. */
+let sheetId=null, sheetSlot=null;
+function usable(e){
+  if(e.gear!=="none"&&!S.gear[e.gear])return false;
+  if(e.style==="plyo"&&!S.style.plyo)return false;
+  if(e.style==="flow"&&!S.style.flow)return false;
+  if(S.style.quiet&&!e.quiet)return false;
+  return true;
+}
+function openSee(id,slot){
+  const e=byId[id]; if(!e)return;
+  sheetId=id; sheetSlot=(slot===undefined||slot===null||slot==="")?null:+slot;
+  const h=HOW[id]||[[],""];
+  $("shPart").textContent=e.part;
+  $("shFig").innerHTML=figSVG(id,"play");
+  $("shName").textContent=e.name;
+  $("shTags").textContent=[e.part,(e.gear!=="none"?gearName(e.gear):""),
+    "●".repeat(e.lv)+"○".repeat(3-e.lv),(e.unit==="time"?"시간형":"횟수형")].filter(Boolean).join(" · ");
+  $("shCue").textContent=e.cue;
+  $("shSteps").innerHTML=(h[0]||[]).map(x=>"<li>"+x+"</li>").join("");
+  $("shBad").innerHTML=h[1]?"<b>흔한 실수</b>"+h[1]:"";
+  const pick=d=>EX.filter(x=>x.id!==e.id&&x.part===e.part&&x.lv===e.lv+d&&usable(x))[0];
+  const alts=[[pick(-1),"쉽게"],[pick(1),"어렵게"],
+    [EX.filter(x=>x.id!==e.id&&x.part===e.part&&x.lv===e.lv&&usable(x))[0],"비슷하게"]].filter(a=>a[0]);
+  $("shAlts").innerHTML=alts.length
+    ? alts.map(a=>'<button class="alt" data-see="'+a[0].id+'"><em>'+a[1]+"</em>"+a[0].name+"</button>").join("")
+    : '<span class="sh-tags" style="text-align:left">바꿀 만한 동작이 없어요 — 설정에서 장비를 켜면 늘어납니다.</span>';
+  const sw=$("shSwap");
+  if(sheetSlot!==null&&routine){ sw.hidden=false; sw.textContent=(sheetSlot+1)+"번을 이 동작으로"; }
+  else sw.hidden=true;
+  $("shVid").href="https://www.youtube.com/results?search_query="+encodeURIComponent(e.name+" 운동 방법");
+  $("sheet").hidden=false; document.body.style.overflow="hidden"; $("sheet").scrollTop=0;
+}
+function closeSee(){ $("sheet").hidden=true; if($("stage").hidden)document.body.style.overflow=""; }
+$("shClose").addEventListener("click",closeSee);
+$("shSwap").addEventListener("click",()=>{
+  if(sheetSlot===null||!routine||!sheetId)return;
+  routine.moves[sheetSlot]=byId[sheetId];
+  renderRoutine(); closeSee();
+});
 
 /* ── 홈 화면에 설치 ──
    설치 단추는 브라우저가 허락할 때만 뜬다(크롬 계열). 사파리는 단추가 없으므로
@@ -970,6 +1323,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.snd){ S[t.dataset.snd]=!S[t.dataset.snd]; renderSettings(); save();
     if(t.dataset.snd==="sound"&&S.sound)beep(760,120); return; }
   if(t.dataset.lib){ libFilter=t.dataset.lib; renderLib(); return; }
+  if(t.dataset.see){ openSee(t.dataset.see,t.dataset.slot); return; }
   if(t.dataset.swap!==undefined){ swapMove(+t.dataset.swap); return; }
   if(t.dataset.del!==undefined){ sessions.splice(+t.dataset.del,1); save(); renderLog(); return; }
 });
@@ -993,6 +1347,7 @@ $("stPrev").addEventListener("click",()=>jump(-1));
 $("stNextBtn").addEventListener("click",()=>jump(1));
 $("stQuit").addEventListener("click",()=>{ if(confirm("여기까지 하고 기록할까요?"))finish(true); });
 document.addEventListener("keydown",e=>{
+  if(!$("sheet").hidden&&e.key==="Escape"){ closeSee(); return; }
   if($("stage").hidden)return;
   if(e.key===" "){ e.preventDefault(); $("stPause").click(); }
   if(e.key==="ArrowRight")jump(1);
