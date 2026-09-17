@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "오늘의 무브",
+  "short_name": "무브",
+  "description": "목표와 가진 장비에 맞춰 오늘 할 운동을 뽑아 주고, 인터벌 타이머로 따라 하며 기록이 쌓이는 개인 운동 앱.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#0D1017",
+  "theme_color": "#0D1017",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "바로 시작", "short_name": "시작", "url": "./?go=start" },
+    { "name": "기록 보기", "short_name": "기록", "url": "./?go=log" }
+  ]
+}
