@@ -96,6 +96,19 @@ body[data-view="today"] .wrap{padding-block-end:184px}
 .tile[aria-pressed="true"]{background:var(--ember-dim); border-color:var(--ember)}
 .tile[aria-pressed="true"] .sp{color:var(--ember)}
 
+/* ── 오늘 무엇을 할까 ── */
+.kinds{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.kind{display:flex; align-items:center; gap:11px; text-align:left; transition:.14s;
+  background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:15px 13px}
+.kind.wide{grid-column:1/-1}
+.kind .em{font-size:23px; line-height:1; flex:none}
+.kind .nm{font-family:"Hahmlet",serif; font-weight:800; font-size:17px; display:block; line-height:1.25}
+.kind .sp{font-family:"Space Mono",monospace; font-size:9.5px; letter-spacing:.06em;
+  color:var(--mute); display:block; margin-top:2px}
+.kind[aria-pressed="true"]{background:var(--ember-dim); border-color:var(--ember)}
+.kind[aria-pressed="true"] .sp{color:var(--ember)}
+.kind:hover{border-color:var(--mute)}
+
 /* ── 시간 눈금 ── */
 .dial{display:flex; border:1px solid var(--line); border-radius:4px; overflow:hidden;
   background:var(--bg2)}
@@ -132,7 +145,10 @@ body[data-view="today"] .wrap{padding-block-end:184px}
 .set li{display:flex; gap:13px; padding:14px 0 13px; border-bottom:1px solid var(--hair);
   align-items:flex-start}
 .set .no{font-family:"Space Mono",monospace; font-size:12px; color:var(--mute);
-  padding-top:3px; width:22px; flex:none}
+  padding:2px 0 0; width:26px; flex:none; text-align:center; line-height:1.4}
+.set .no:hover{color:var(--ember)}
+.set li.kept{background:linear-gradient(90deg,var(--ember-dim),transparent 55%)}
+.set li.kept .no{color:var(--ember)}
 .set .body{flex:1; min-width:0}
 .set .nm{font-family:"Hahmlet",serif; font-weight:500; font-size:17px; line-height:1.35}
 .set .cue{display:block; font-size:12.5px; color:var(--mute); margin-top:2px; line-height:1.5}
@@ -153,6 +169,7 @@ body[data-view="today"] .wrap{padding-block-end:184px}
 .fig .f0 .hd{fill:var(--mute); opacity:.38}
 .fig .pr{fill:none; stroke:var(--ember); stroke-width:4.4; stroke-linecap:round}
 .fig .bd{fill:none; stroke:var(--ice); stroke-width:2.2; stroke-dasharray:4 3}
+.fig .cb{fill:none; stroke:var(--ice); stroke-width:2.2}
 .fig .gd{fill:none; stroke:var(--line); stroke-width:2; stroke-dasharray:4 4}
 /* 크게 볼 때는 두 자세를 번갈아 — 움직임이 한눈에 보이게 */
 @keyframes figA{0%,42%{opacity:1}54%,100%{opacity:.14}}
@@ -352,11 +369,15 @@ img{max-width:100%}
     <h1 class="hero">오늘의 무브</h1>
     <p class="heroSub" id="heroSub"></p>
 
-    <div class="headrow"><span class="lbl">목표</span></div>
-    <div class="tiles" id="goalRow"></div>
+    <div class="headrow"><span class="lbl">무엇을 할까요</span></div>
+    <div class="kinds" id="kindRow"></div>
+    <div id="gearRow" hidden></div>
 
-    <div class="headrow"><span class="lbl">시간</span></div>
+    <div class="headrow"><span class="lbl">시간</span><span class="lbl" id="minNow"></span></div>
     <div class="dial" id="minRow"></div>
+
+    <div class="headrow"><span class="lbl">강도</span><span class="lbl" id="lvNow"></span></div>
+    <div class="dial" id="lvRow"></div>
 
     <div class="headrow">
       <span class="lbl">오늘의 세트</span>
@@ -405,12 +426,7 @@ img{max-width:100%}
     <div class="headrow"><span class="lbl">앱으로 쓰기</span></div>
     <div class="rows" id="installBox"></div>
     <div class="headrow"><span class="lbl">가진 것</span></div>
-    <div class="rows" id="gearBox"></div>
-    <div class="headrow"><span class="lbl">어떤 동작까지</span></div>
-    <div class="rows" id="styleBox"></div>
-    <div class="headrow"><span class="lbl">강도</span></div>
-    <div class="dial" id="levelRow"></div>
-    <p class="note" id="levelHint"></p>
+    <div class="rows" id="quietBox"></div>
     <div class="headrow"><span class="lbl">운동 중</span></div>
     <div class="rows" id="soundBox"></div>
     <p class="sync" id="syncNote"></p>
@@ -569,6 +585,14 @@ const RAW=[
   ["drenegade","덤벨 레니게이드 로우",P.C,"db","basic",3,"reps","플랭크 자세에서 골반 고정한 채 한 팔씩 당기기",1],
   ["dcarry","덤벨 파머스 홀드",P.C,"db","basic",1,"time","양손에 들고 어깨를 편 채 버티기",1],
   ["dstepup","덤벨 스텝업",P.L,"db","basic",3,"reps","덤벨을 들고 의자·계단에 올라섰다 내려오기",1],
+  ["clatpull","케이블 랫 풀다운",P.U,"cable","basic",2,"reps","가슴을 편 채 바를 쇄골 쪽으로 당겨 내린다",1],
+  ["crow","케이블 시티드 로우",P.U,"cable","basic",2,"reps","등을 세우고 손잡이를 배꼽 쪽으로 당긴다",1],
+  ["cpress","케이블 체스트 프레스",P.U,"cable","basic",2,"reps","가슴 높이에서 앞으로 밀어낸다",1],
+  ["cpushdown","케이블 푸시다운",P.U,"cable","basic",1,"reps","팔꿈치를 옆구리에 붙인 채 아래로 편다",1],
+  ["ccurl","케이블 컬",P.U,"cable","basic",1,"reps","팔꿈치 고정, 손만 올렸다 천천히 내린다",1],
+  ["cface","케이블 페이스 풀",P.U,"cable","basic",2,"reps","얼굴 높이로 당기며 팔꿈치를 뒤로 벌린다",1],
+  ["cchop","케이블 우드촙",P.C,"cable","basic",2,"reps","위에서 반대쪽 아래로 몸통을 돌리며 내린다",1],
+  ["ckick","케이블 킥백",P.L,"cable","basic",2,"reps","한 다리를 뒤로 곧게 차며 엉덩이를 조인다",1],
   ["bearhold","베어 홀드",P.C,"none","flow",2,"time","네발에서 무릎을 바닥에서 5cm만 띄우고 버티기",1],
   ["bearcrawl","베어 크롤",P.F,"none","flow",3,"time","무릎을 띄운 채 제자리에서 손발을 번갈아",1],
   ["crabhold","크랩 홀드",P.C,"none","flow",2,"time","뒤로 앉아 손발로 바닥을 짚고 엉덩이 들어 버티기",1],
@@ -646,6 +670,7 @@ const FIG={
   pogo:[[0,6,8,-8,8,-8,-15,12,0],[0,0,0,0,0,0,-22,16,9]],
   reach:[[0,28,62,-42,62,-42,-42,-28,0],[0,0,-8,8,-8,8,178,178,15]],
   sglhop:[[0,6,6,-6,-38,-62,10,10,0],[0,0,-6,6,-48,-72,62,62,11]],
+  kickback:[[0,12,2,-2,-8,0,-8,-8,0],[0,22,2,-2,-58,-12,-8,-8,0]],
 };
 /* 어떤 동작이 어떤 그림을 쓰는가 — 같은 움직임이면 그림을 나눠 쓴다 */
 const FIGOF={
@@ -660,6 +685,8 @@ const FIGOF={
   jumpsquat:"jump",jumplunge:"lunge",skater:"skater",tuckjump:"tuck",broad:"jump",boxjump:"stepup",
   plyopush:"pushup",powerskip:"highknee",
   pogo:"pogo",vertical:"reach",sglhop:"sglhop",depthjump:"jump",
+  clatpull:"pull",crow:"row",cpress:"chest",cpushdown:"tri",ccurl:"curl",
+  cface:"row",cchop:"twist",ckick:"kickback",
   bsquat:"squat",bgm:"hinge",bmonster:"monster",bthrust:"bridge",bdead:"hinge",brow:"row",
   bpull:"pull",bpress:"press",bchest:"chest",bcurl:"curl",btri:"tri",bapart:"apart",
   dgoblet:"squat",dlunge:"lunge",drdl:"hinge",dthruster:"thruster",dswing:"swing",dpress:"press",
@@ -693,6 +720,7 @@ function figParts(j,gear){
   const bar=w=>`<path class="pr" d="M${(w[0]-6).toFixed(1)} ${w[1].toFixed(1)}L${(w[0]+6).toFixed(1)} ${w[1].toFixed(1)}"/>`;
   if(gear==="db"){ g+=bar(j.wr); if(j.wr2)g+=bar(j.wr2); }
   if(gear==="band")g+=`<path class="bd" d="M${j.wr[0].toFixed(1)} ${j.wr[1].toFixed(1)}L${j.ft[0].toFixed(1)} ${j.ft[1].toFixed(1)}"/>`;
+  if(gear==="cable")g+=`<path class="cb" d="M${j.wr[0].toFixed(1)} ${j.wr[1].toFixed(1)}L${(j.wr[0]+46).toFixed(1)} ${(j.wr[1]-14).toFixed(1)}"/>`;
   return g;
 }
 function figPts(j){
@@ -700,9 +728,57 @@ function figPts(j){
   if(j.el2)a.push(j.el2,j.wr2);
   return a;
 }
+/* 두 끝 자세로 크기와 좌우 자리를 한 번만 정한다(움직이는 동안 흔들리지 않게) */
+const figBoxCache={};
+function figBox(tpl,pair){
+  if(figBoxCache[tpl])return figBoxCache[tpl];
+  const J=[figJoints(pair[0]),figJoints(pair[1])];
+  const pts=J.reduce((a,j)=>a.concat(figPts(j).map(q=>[j.flip?-q[0]:q[0],q[1]-j.lift])),[]);
+  const xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]);
+  const minX=Math.min.apply(null,xs), maxX=Math.max.apply(null,xs);
+  const minY=Math.min.apply(null,ys), maxY=Math.max.apply(null,ys);
+  const scale=Math.min(1,84/Math.max(maxX-minX+SEG.head*2,maxY-minY+SEG.head*2));
+  return (figBoxCache[tpl]={scale:scale,tx:50-((minX+maxX)/2)*scale});
+}
+/* 두 자세 사이를 이어 준다 — 각도를 그대로 섞으면 사람이 움직이는 모양이 된다 */
+function figPose(pair,u){
+  const A=pair[0],B=pair[1],q=[A[0]];
+  for(let i=1;i<9;i++)q[i]=(A[i]||0)+((B[i]||0)-(A[i]||0))*u;
+  q[9]=u<0.5?A[9]:B[9];
+  return q;
+}
+const REDUCED=(function(){ try{ return matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){ return false; } })();
+function figPaint(el){
+  const id=el.dataset.ex; if(!id||el.closest("[hidden]"))return;
+  const tpl=FIGOF[id]||"stand", pair=FIG[tpl]||FIG.stand;
+  const per=+el.dataset.per||2000;
+  const ph=(performance.now()%per)/per;
+  let u=ph<0.5?ph*2:(1-ph)*2;                 // 갔다가 돌아온다
+  u=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;       // 시작과 끝은 천천히, 가운데는 빠르게
+  const j=figJoints(figPose(pair,u)), box=figBox(tpl,pair);
+  const pts=figPts(j).map(q=>[j.flip?-q[0]:q[0],q[1]-j.lift]);
+  const ty=93-Math.max.apply(null,pts.map(q=>q[1]))*box.scale;
+  const g=el.querySelector("g.sk"); if(!g)return;
+  g.setAttribute("transform","translate("+box.tx.toFixed(1)+" "+ty.toFixed(1)+") scale("+
+    box.scale.toFixed(3)+") translate(0 "+(-j.lift).toFixed(1)+")"+(j.flip?" scale(-1 1)":""));
+  g.innerHTML=figParts(j,(byId[id]||{}).gear||"none");
+}
+let figLoop=null;
+function figTick(){
+  const els=document.querySelectorAll(".fig.play");
+  els.forEach(figPaint);
+  figLoop=els.length?requestAnimationFrame(figTick):null;
+}
+function figStart(){ if(!figLoop)figLoop=requestAnimationFrame(figTick); }
+
 /* 두 자세를 한 그림에 겹쳐 그린다 — 자리는 두 자세를 합쳐 한 번만 잡는다 */
 function figSVG(id,cls){
-  const pair=FIG[FIGOF[id]||"stand"]||FIG.stand;
+  const tpl=FIGOF[id]||"stand";
+  // 움직이는 그림 — 뼈대만 두고 한 프레임씩 다시 그린다
+  if(cls&&cls.indexOf("play")>=0&&!REDUCED)
+    return '<svg class="fig play" data-ex="'+id+'" viewBox="0 0 100 100" aria-hidden="true">'+
+      '<path class="gd" d="M8 94L92 94"/><g class="sk"></g></svg>';
+  const pair=FIG[tpl]||FIG.stand;
   const gear=(byId[id]||{}).gear||"none";
   const J=[figJoints(pair[0]),figJoints(pair[1])];
   const local=J.map(j=>figPts(j).map(pt=>[j.flip?-pt[0]:pt[0],pt[1]-j.lift]));
@@ -799,6 +875,14 @@ const HOW={
   drenegade:[["덤벨을 잡고 푸시업 자세를 만든다","한쪽 덤벨을 허리로 당긴다","골반을 고정한 채 번갈아"],"골반이 좌우로 크게 흔들리는 것"],
   dcarry:[["양손에 덤벨을 들고 선다","어깨를 펴고 배에 힘을 준다","자세를 유지한 채 버틴다"],"어깨가 앞으로 말리는 것"],
   dstepup:[["덤벨을 들고 계단 앞에 선다","한 발로 올라선다","같은 발로 천천히 내려온다"],"반동으로 뛰어 올라가는 것"],
+  clatpull:[["바를 어깨보다 넓게 잡고 앉는다","가슴을 펴고 바를 쇄골 쪽으로 당겨 내린다","천천히 팔이 펴질 때까지 되돌린다"],"몸을 뒤로 눕혀 반동으로 당기는 것"],
+  crow:[["발을 받침에 두고 등을 세워 앉는다","손잡이를 배꼽 쪽으로 당기며 견갑을 모은다","천천히 팔을 편다"],"상체를 앞뒤로 흔드는 것"],
+  cpress:[["가슴 높이 손잡이를 잡고 한 발을 앞으로","가슴 앞에서 앞으로 밀어낸다","천천히 되돌린다"],"어깨가 앞으로 말리는 것"],
+  cpushdown:[["바를 어깨너비로 잡고 선다","팔꿈치를 옆구리에 붙인 채 아래로 편다","천천히 굽힌다"],"팔꿈치가 앞뒤로 움직이는 것"],
+  ccurl:[["낮은 도르래에서 바를 잡고 선다","팔꿈치를 고정하고 손만 올린다","3초에 걸쳐 내린다"],"몸을 흔들어 반동으로 올리는 것"],
+  cface:[["높은 도르래에서 줄을 잡고 선다","얼굴 높이로 당기며 팔꿈치를 뒤로 벌린다","천천히 되돌린다"],"무겁게 걸어 어깨가 으쓱 올라가는 것"],
+  cchop:[["높은 도르래를 두 손으로 잡고 옆으로 선다","몸통을 돌리며 반대쪽 무릎 쪽으로 내린다","천천히 되돌린다 — 좌우 번갈아"],"팔로만 내리고 몸통은 가만히 있는 것"],
+  ckick:[["발목에 줄을 걸고 손잡이를 잡는다","한 다리를 뒤로 곧게 차며 엉덩이를 조인다","천천히 제자리로"],"허리를 젖혀 다리를 더 올리는 것"],
   bearhold:[["네발로 엎드려 손은 어깨 아래, 무릎은 골반 아래","발끝으로 무릎을 바닥에서 5cm 띄운다","등을 평평하게 유지하며 버틴다"],"엉덩이를 높이 들어 쉬는 것"],
   bearcrawl:[["베어 자세로 무릎을 띄운다","반대쪽 손과 발을 함께 조금씩 옮긴다","등이 흔들리지 않게 낮게 유지"],"엉덩이가 좌우로 출렁이는 것"],
   crabhold:[["앉아서 손은 엉덩이 뒤, 무릎은 세운다","엉덩이를 들어 어깨-무릎을 평평하게","가슴을 열고 버틴다"],"엉덩이가 바닥으로 처지는 것"],
@@ -813,47 +897,47 @@ const HOW={
   thoracic:[["네발에서 한 손을 머리 뒤에 댄다","팔꿈치를 바닥 쪽으로 감았다가","천장으로 크게 열며 가슴을 돌린다"],"허리로 회전하는 것"],
 };
 
-/* 목표 — 어떻게 운동하는가(원리)와 그에 맞는 인터벌·부위 차례 */
-const GOALS={
-  fat:{name:"체지방 감량",emoji:"🔥",work:40,rest:20,
-    how:"큰 근육과 숨이 차는 동작을 번갈아 두고 휴식을 짧게 — 심박이 높은 구간을 길게 가져갑니다.",
-    slots:[P.L,"*cardio",P.U,P.C,P.L,"*cardio"]},
-  str:{name:"근력",emoji:"💪",work:45,rest:25,
-    how:"한 번을 천천히 깊게. 쉬는 시간을 넉넉히 두고 힘을 온전히 쓰는 데 집중합니다.",
-    slots:[P.L,P.U,P.L,P.U,P.C]},
-  end:{name:"근지구력",emoji:"🔁",work:35,rest:15,
-    how:"부위를 돌려 가며 오래 — 지친 뒤에도 자세가 무너지지 않게 버티는 힘을 기릅니다.",
-    slots:[P.L,P.U,P.C,"*cardio",P.L,P.U]},
-  hiit:{name:"심폐지구력",emoji:"🫁",work:30,rest:15,
-    how:"숨이 찬 상태를 얼마나 오래 유지하느냐가 전부입니다. 큰 동작 위주로 쉬지 않고 이어갑니다.",
+/* 오늘 무엇을 할까 — 고르는 건 이 다섯 가지뿐이다.
+   갈래마다 운동·휴식 시간과 '어떤 부위를 어떤 차례로' 넣을지가 정해져 있다.
+   @부위 = 기구를 쓰는 그 부위 · *갈래:부위 = 그 갈래의 그 부위 */
+const KINDS={
+  cardio:{name:"유산소",emoji:"🏃",work:30,rest:15,
+    how:"숨이 차는 동작을 쉬지 않고 이어 갑니다. 심장과 폐를 크게 쓰는 날.",
     slots:["*cardio",P.F,"*cardio",P.L,"*cardio",P.F]},
-  power:{name:"폭발력",emoji:"⚡",work:20,rest:40,
-    how:"짧고 세게. 20초만 전력으로 쓰고 40초를 회복해, 매 세트를 가장 좋은 상태로 시작합니다.",
-    slots:["*plyo","*plyo",P.U,"*plyo",P.C],needs:"plyo"},
-  jump:{name:"점프력 강화",emoji:"🦘",work:15,rest:45,
-    how:"높이 뛰는 힘은 '많이'가 아니라 '한 번을 최대로'. 15초만 전력으로 뛰고 45초를 완전히 쉬어야 다음 세트도 같은 높이가 나옵니다.",
-    slots:["*plyo:하체","*plyo:하체",P.L,"*plyo:하체","*plyo"],needs:"plyo"},
-  flow:{name:"회복·유연",emoji:"🧘",work:45,rest:15,
-    how:"천천히, 크게, 숨에 맞춰. 굳은 곳을 풀고 관절이 움직이는 범위를 되찾는 날입니다.",
-    slots:["*flow","*flow",P.C,"*flow",P.L,"*flow"],needs:"flow"},
+  body:{name:"맨몸",emoji:"🙆",work:40,rest:20,bodyOnly:true,
+    how:"도구 없이 내 몸무게로. 하체·상체·코어를 고루 씁니다.",
+    slots:[P.L,P.U,P.C,P.L,P.U,P.C]},
+  gear:{name:"기구",emoji:"🏋️",work:40,rest:20,gearOnly:true,
+    how:"덤벨·케이블·밴드로 저항을 더해 근력을 올립니다.",
+    slots:["@"+P.L,"@"+P.U,"@"+P.L,"@"+P.U,"@"+P.C]},
+  jump:{name:"점프력",emoji:"🦘",work:15,rest:45,
+    how:"높이 뛰는 힘은 한 번을 최대로 낼 때 늡니다. 짧게 전력, 길게 회복.",
+    slots:["*plyo:하체","*plyo:하체",P.L,"*plyo:하체","*plyo"]},
+  flex:{name:"유연성",emoji:"🧘",work:45,rest:15,
+    how:"천천히 크게, 숨에 맞춰. 굳은 곳을 풀고 움직이는 범위를 되찾습니다.",
+    slots:["*flow","*flow","*flow","*flow","*flow","*flow"]},
 };
-const GOAL_KEYS=Object.keys(GOALS);
-const MINUTES=[8,12,16,20,25,30];
-const LEVELS=[[1,"입문","처음이거나 몸이 무거운 날 — 쉬운 동작만 나옵니다."],
-  [2,"보통","기본 동작 위주로, 어려운 동작은 가끔 섞습니다."],
-  [3,"고강도","난도 높은 동작까지 모두 나옵니다."]];
-const GEARS=[["band","고무 밴드","루프든 튜브든 하나면 됩니다"],
-  ["db","덤벨","없으면 물통·가방으로 대신해도 같은 동작이에요"],
-  ["chair","의자·계단","딥스·스텝업·인클라인 푸시업에 씁니다"]];
-const STYLES=[["plyo","플라이오메트릭","점프처럼 짧고 세게 튀어오르는 동작"],
-  ["flow","애니멀 플로우","네발로 움직이며 온몸을 잇는 동작"],
-  ["quiet","조용히 하기","뛰거나 쿵 소리 나는 동작을 뺍니다"]];
+/* 예전에 쓰던 목표를 새 갈래로 옮긴다 — 지난 기록도 그대로 읽히게 */
+const OLD_GOAL={fat:"cardio",str:"body",end:"body",hiit:"cardio",power:"jump",flow:"flex"};
+function kindOf(k){ return KINDS[k]||KINDS[OLD_GOAL[k]]||null; }
+const KIND_KEYS=Object.keys(KINDS);
+const MINUTES=[10,20,30];
+const LEVELS=[[1,"쉽게","쉬운 동작만, 휴식도 5초 더 깁니다."],
+  [2,"보통","기본 동작 위주로 — 정해진 시간 그대로."],
+  [3,"세게","어려운 동작까지, 휴식은 5초 짧습니다."]];
+const GEARS=[["db","덤벨","집이든 헬스장이든 — 없으면 물통·가방으로"],
+  ["cable","케이블","헬스장 케이블 머신"],
+  ["band","밴드","고무밴드 하나면 됩니다"],
+  ["chair","의자·계단","딥스·스텝업에 씁니다"]];
+const GEAR_SHORT={db:"덤벨",cable:"케이블",band:"밴드",chair:"의자"};
+const QUIETS=[["quiet","조용히 하기","뛰거나 쿵 소리 나는 동작을 뺍니다"],
+  ["chair","의자·계단 있음","딥스·스텝업 같은 동작이 나옵니다"]];
 const PREP=12;
 const DAYS=["일","월","화","수","목","금","토"];
 
 /* ── 상태 ── */
-const DEF={goal:"fat",minutes:16,level:2,gear:{band:false,db:false,chair:true},
-  style:{plyo:false,flow:false,quiet:false},sound:true,voice:true};
+const DEF={goal:"fat",kind:"body",minutes:20,level:2,gear:{band:false,db:false,cable:false,chair:true},
+  quiet:false,sound:true,voice:true};
 let S=JSON.parse(JSON.stringify(DEF));
 let sessions=[], routine=null, seedBase=0, libFilter="전체";
 const $=id=>document.getElementById(id);
@@ -865,7 +949,8 @@ function localSave(){ try{ localStorage.setItem(LS,JSON.stringify({S,sessions}))
 function apply(d){
   if(d&&d.S){ S=Object.assign(JSON.parse(JSON.stringify(DEF)),d.S);
     S.gear=Object.assign({},DEF.gear,d.S.gear||{});
-    S.style=Object.assign({},DEF.style,d.S.style||{}); }
+    if(!KINDS[S.kind])S.kind=OLD_GOAL[S.goal]||"body";   // 예전 목표를 새 갈래로 옮긴다
+    if(d.S.style&&d.S.style.quiet)S.quiet=true; }
   if(d&&Array.isArray(d.sessions))sessions=d.sessions.slice(0,400);
 }
 async function save(){
@@ -915,16 +1000,23 @@ function rng(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)|0;
   return ((t^(t>>>14))>>>0)/4294967296; }; }
 function todaySeed(){ const d=new Date();
   return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(); }
-function pool(){
+function usable(e){
+  if(e.gear!=="none"&&!S.gear[e.gear])return false;   // 없는 기구는 안 나온다
+  if(S.quiet&&!e.quiet)return false;                  // 조용히 하는 날은 뛰는 동작을 뺀다
+  return e.lv<=S.level;
+}
+function pool(kind){
+  const k=kind||KINDS[S.kind]||KINDS.body;
   return EX.filter(e=>{
-    if(e.gear!=="none"&&!S.gear[e.gear])return false;
-    if(e.style==="plyo"&&!S.style.plyo)return false;
-    if(e.style==="flow"&&!S.style.flow)return false;
-    if(S.style.quiet&&!e.quiet)return false;
-    return e.lv<=S.level;
+    if(!usable(e))return false;
+    if(k.bodyOnly&&e.gear!=="none")return false;
+    if(k.gearOnly&&(e.gear==="none"||e.gear==="chair"))return false;
+    return true;
   });
 }
+function haveGear(){ return ["db","cable","band"].some(g=>S.gear[g]); }
 function matches(e,slot){
+  if(slot.charAt(0)==="@")return e.gear!=="none"&&e.gear!=="chair"&&e.part===slot.slice(1);
   if(slot.charAt(0)!=="*")return e.part===slot;
   const t=slot.slice(1).split(":");          // "*plyo" 또는 "*plyo:하체"
   return e.style===t[0]&&(!t[1]||e.part===t[1]);
@@ -935,8 +1027,9 @@ function recentIds(){
   sessions.slice(0,3).forEach((s,i)=>(s.ids||[]).forEach(id=>{ r[id]=Math.max(r[id]||0,3-i); }));
   return r;
 }
-function build(goalKey,minutes,seed){
-  const g=GOALS[goalKey], rand=rng(seed), av=pool(), recent=recentIds(), used={};
+function build(kindKey,minutes,seed){
+  const g=KINDS[kindKey]||KINDS.body, rand=rng(seed), av=pool(g), recent=recentIds(), used={};
+  const rest=Math.max(8,g.rest+(2-S.level)*5);   // 강도에 따라 쉬는 시간만 늘리고 줄인다
   const pick=slot=>{
     let c=av.filter(e=>!used[e.id]&&matches(e,slot));
     if(!c.length)c=av.filter(e=>!used[e.id]);
@@ -952,7 +1045,7 @@ function build(goalKey,minutes,seed){
   if(!all.length)return null;
   /* 고른 시간에 가장 가까워지는 '동작 수 × 라운드'를 찾는다.
      오차가 같으면 동작이 많은 쪽(덜 지루한 쪽)을 쓴다. */
-  const target=minutes*60-PREP, unit=g.work+g.rest;
+  const target=minutes*60-PREP, unit=g.work+rest;
   let best=null;
   for(let n=all.length;n>=Math.min(4,all.length);n--)
     for(let r=1;r<=10;r++){
@@ -961,20 +1054,32 @@ function build(goalKey,minutes,seed){
     }
   const moves=all.slice(0,best.n), rounds=Math.max(1,best.r);
   const parts=[]; moves.forEach(e=>{ if(parts.indexOf(e.part)<0)parts.push(e.part); });
-  return {goal:goalKey,moves,rounds,work:g.work,rest:g.rest,
+  return {goal:kindKey,moves,rounds,work:g.work,rest:rest,lock:moves.map(()=>false),
     sec:PREP+rounds*moves.length*unit,
     name:parts.slice(0,3).join("·")+" 서킷"};
 }
-function refresh(reseed){
-  if(reseed)seedBase=Math.floor(Math.random()*1e9);
-  routine=build(S.goal,S.minutes,todaySeed()+seedBase*7+S.minutes*13);
+/* 고를 때마다·다시 뽑을 때마다 새로 섞는다. 📌로 고정한 자리는 그대로 둔다. */
+function refresh(){
+  const old=routine;
+  seedBase=Math.floor(Math.random()*1e9);
+  const next=build(S.kind,S.minutes,seedBase);
+  if(next&&old&&old.goal===next.goal&&old.lock){
+    old.lock.forEach((on,i)=>{
+      if(!on||!old.moves[i]||i>=next.moves.length)return;
+      const keep=old.moves[i];
+      const dup=next.moves.findIndex(m=>m.id===keep.id);
+      if(dup>=0&&dup!==i)next.moves[dup]=next.moves[i];   // 겹치면 자리를 맞바꾼다
+      next.moves[i]=keep; next.lock[i]=true;
+    });
+  }
+  routine=next;
   renderRoutine();
 }
 
 /* ── 그리기 ── */
 function mmss(s){ const m=Math.floor(s/60), r=Math.round(s%60);
   return m+":"+String(r).padStart(2,"0"); }
-function gearName(g){ return g==="band"?"밴드":g==="db"?"덤벨":g==="chair"?"의자":""; }
+function gearName(g){ return GEAR_SHORT[g]||""; }
 
 function renderHead(){
   const d=new Date();
@@ -983,25 +1088,37 @@ function renderHead(){
   const n=streak();
   $("streakStr").textContent=n?n+"일 연속":"오늘 시작";
 }
-function renderGoals(){
-  $("goalRow").innerHTML=GOAL_KEYS.map(k=>{
-    const g=GOALS[k];
-    return '<button class="tile" data-goal="'+k+'" aria-pressed="'+(S.goal===k)+'">'+
-      '<span class="em">'+g.emoji+'</span><span class="nm">'+g.name+'</span>'+
-      '<span class="sp">'+g.work+'/'+g.rest+'</span></button>';
+function renderKinds(){
+  $("kindRow").innerHTML=KIND_KEYS.map((k,i)=>{
+    const g=KINDS[k];
+    return '<button class="kind'+(i===KIND_KEYS.length-1?" wide":"")+'" data-kind="'+k+'"'+
+      ' aria-pressed="'+(S.kind===k)+'"><span class="em">'+g.emoji+"</span>"+
+      '<span class="tx"><span class="nm">'+g.name+"</span>"+
+      '<span class="sp">'+g.work+"초 / "+Math.max(8,g.rest+(2-S.level)*5)+"초 쉼</span></span></button>";
   }).join("");
-  $("heroSub").textContent=GOALS[S.goal].how;
+  $("heroSub").textContent=(KINDS[S.kind]||KINDS.body).how;
+  const box=$("gearRow"), on=S.kind==="gear";
+  box.hidden=!on;
+  if(on)box.innerHTML='<div class="headrow"><span class="lbl">가진 기구</span></div>'+
+    '<div class="chips">'+["db","cable","band"].map(g=>
+      '<button class="chip" data-gear="'+g+'" aria-pressed="'+!!S.gear[g]+'">'+GEAR_SHORT[g]+"</button>").join("")+"</div>";
 }
 function renderMin(){
   $("minRow").innerHTML=MINUTES.map(m=>
-    '<button data-min="'+m+'" aria-pressed="'+(S.minutes===m)+'">'+m+"</button>").join("");
+    '<button data-min="'+m+'" aria-pressed="'+(S.minutes===m)+'">'+m+"분</button>").join("");
+  $("minNow").textContent=S.minutes+"분";
+  $("lvRow").innerHTML=LEVELS.map(l=>
+    '<button data-level="'+l[0]+'" aria-pressed="'+(S.level===l[0])+'">'+l[1]+"</button>").join("");
+  $("lvNow").textContent=(LEVELS.find(l=>l[0]===S.level)||LEVELS[1])[1];
 }
 function renderRoutine(){
-  const g=GOALS[S.goal];
   if(!routine){
-    $("rName").textContent="만들 수 있는 구성이 없어요";
+    const noGear=S.kind==="gear"&&!haveGear();
+    $("rName").textContent=noGear?"어떤 기구가 있나요?":"만들 수 있는 구성이 없어요";
     $("rTime").textContent="–"; $("rSpec").textContent="";
-    $("rHint").textContent="설정에서 강도를 올리거나 장비·갈래를 더 켜 주세요.";
+    $("rHint").textContent=noGear
+      ? "위에서 덤벨·케이블·밴드 중 가진 것을 눌러 주세요."
+      : "강도를 올리거나, 설정에서 조용히 하기를 꺼 보세요.";
     $("rRail").innerHTML=""; $("rMoves").innerHTML="";
     $("startBtn").disabled=true; $("sbTime").textContent="–"; $("sbSpec").textContent="";
     return;
@@ -1019,14 +1136,16 @@ function renderRoutine(){
   });
   $("rRail").innerHTML=rail;
   $("rMoves").innerHTML=routine.moves.map((e,i)=>
-    '<li><span class="no">'+String(i+1).padStart(2,"0")+"</span>"+
-    '<button class="thumb" data-see="'+e.id+'" data-slot="'+i+'" aria-label="'+e.name+' 설명 보기">'+figSVG(e.id)+"</button>"+
+    '<li'+(routine.lock[i]?' class="kept"':"")+'><button class="no" data-lock="'+i+'" title="이 동작 고정하기">'+
+    (routine.lock[i]?"📌":String(i+1).padStart(2,"0"))+"</button>"+
+    '<button class="thumb" data-see="'+e.id+'" data-slot="'+i+'" aria-label="'+e.name+' 설명 보기">'+figSVG(e.id,"play")+"</button>"+
     '<button class="body" data-see="'+e.id+'" data-slot="'+i+'" style="text-align:left"><span class="nm">'+e.name+"</span>"+
     '<span class="cue">'+e.cue+"</span></button>"+
     '<span class="side"><span class="sec">'+routine.work+"″</span>"+
     '<span class="part">'+e.part+(e.gear!=="none"?' <em>'+gearName(e.gear)+"</em>":"")+"</span>"+
     '<button class="swap" data-swap="'+i+'">바꾸기</button></span></li>').join("");
   const t=routine.moves.filter(e=>e.unit==="time").length;
+  figStart();
   $("rHint").textContent="동작마다 "+routine.work+"초, 라운드마다 처음으로 돌아갑니다."+
     (t?" 시간형 "+t+"개는 그 시간 동안 버티면 됩니다.":"");
 }
@@ -1035,21 +1154,18 @@ function togHTML(kind,key,title,desc,on){
     '<button class="tog" data-'+kind+'="'+key+'" aria-pressed="'+!!on+'" aria-label="'+title+'"></button></div>';
 }
 function renderSettings(){
-  $("gearBox").innerHTML=GEARS.map(g=>togHTML("gear",g[0],g[1],g[2],S.gear[g[0]])).join("");
-  $("styleBox").innerHTML=STYLES.map(g=>togHTML("style",g[0],g[1],g[2],S.style[g[0]])).join("");
-  $("levelRow").innerHTML=LEVELS.map(l=>
-    '<button data-level="'+l[0]+'" aria-pressed="'+(S.level===l[0])+'">'+l[1]+"</button>").join("");
-  $("levelHint").textContent=(LEVELS.find(l=>l[0]===S.level)||LEVELS[1])[2];
+  $("quietBox").innerHTML=togHTML("quiet","quiet","조용히 하기","뛰거나 쿵 소리 나는 동작을 뺍니다",S.quiet)
+    +togHTML("gear","chair","의자·계단 있음","딥스·스텝업 같은 동작이 나옵니다",S.gear.chair);
   $("soundBox").innerHTML=togHTML("snd","sound","소리","남은 3초 카운트다운과 전환음",S.sound)+
     togHTML("snd","voice","음성 안내","다음 동작 이름을 읽어 줍니다",S.voice);
 }
 function renderLib(){
   const f=libFilter;
   const list=EX.filter(e=>f==="전체"?true:
-    (f==="밴드"?e.gear==="band":f==="덤벨"?e.gear==="db":f==="의자"?e.gear==="chair":
+    (f==="밴드"?e.gear==="band":f==="덤벨"?e.gear==="db":f==="케이블"?e.gear==="cable":f==="의자"?e.gear==="chair":
      f==="플라이오"?e.style==="plyo":f==="플로우"?e.style==="flow":e.part===f));
   $("libCount").textContent=list.length+" / "+EX.length+" 가지";
-  $("libFilter").innerHTML=["전체",P.L,P.U,P.C,P.F,"밴드","덤벨","의자","플라이오","플로우"].map(k=>
+  $("libFilter").innerHTML=["전체",P.L,P.U,P.C,P.F,"덤벨","케이블","밴드","의자","플라이오","플로우"].map(k=>
     '<button data-lib="'+k+'" aria-pressed="'+(f===k)+'">'+k+"</button>").join("");
   $("libList").innerHTML=list.map(e=>
     '<div class="it"><span class="thumb">'+figSVG(e.id)+"</span>"+
@@ -1084,7 +1200,7 @@ function renderLog(){
     '<div class="bar"><span class="k">'+k+'</span><span class="t"><i style="width:'+
     Math.round(parts[k]/max*100)+'%"></i></span><span class="v">'+parts[k]+"</span></div>").join("");
   $("logList").innerHTML=sessions.length?sessions.slice(0,40).map((s,i)=>{
-    const d=new Date(s.ts), g=GOALS[s.goal];
+    const d=new Date(s.ts), g=kindOf(s.goal);
     return '<li><span class="d">'+String(d.getMonth()+1).padStart(2,"0")+"."+
       String(d.getDate()).padStart(2,"0")+"</span>"+
       '<span class="t"><b>'+(g?g.emoji+" "+g.name:s.goal)+(s.partial?" · 중단":"")+"</b>"+
@@ -1176,7 +1292,7 @@ function draw(){
   const ex=s.ex;
   const figId=ex?ex.id:"";
   if($("stFig").dataset.id!==figId){ $("stFig").dataset.id=figId;
-    $("stFig").innerHTML=ex?figSVG(ex.id,"play"):""; }
+    $("stFig").innerHTML=ex?figSVG(ex.id,"play"):""; figStart(); }
   if(s.t==="work"&&ex){
     $("stUnit").textContent="SEC";
     $("stMove").textContent=ex.name;
@@ -1216,7 +1332,7 @@ function finish(partial){
   if(!partial)say("수고했어요");
   go("log");
   $("doneSlot").innerHTML='<div class="done"><b>'+(partial?"여기까지 했어요":"끝냈습니다")+"</b>"+
-    '<span>'+min+"분 · "+(GOALS[routine.goal]||{}).name+" · "+routine.moves.length+
+    '<span>'+min+"분 · "+((kindOf(routine.goal)||{}).name||"")+" · "+routine.moves.length+
     "동작 × "+routine.rounds+"R</span></div>";
   setTimeout(()=>{ $("doneSlot").innerHTML=""; },12000);
 }
@@ -1225,13 +1341,6 @@ function finish(partial){
    이름만으로는 무슨 동작인지 알 수 없다. 그림(두 자세를 번갈아)과 순서, 흔한 실수,
    바꿔 할 수 있는 동작, 영상 검색을 한 화면에 모은다. */
 let sheetId=null, sheetSlot=null;
-function usable(e){
-  if(e.gear!=="none"&&!S.gear[e.gear])return false;
-  if(e.style==="plyo"&&!S.style.plyo)return false;
-  if(e.style==="flow"&&!S.style.flow)return false;
-  if(S.style.quiet&&!e.quiet)return false;
-  return true;
-}
 function openSee(id,slot){
   const e=byId[id]; if(!e)return;
   sheetId=id; sheetSlot=(slot===undefined||slot===null||slot==="")?null:+slot;
@@ -1254,7 +1363,7 @@ function openSee(id,slot){
   if(sheetSlot!==null&&routine){ sw.hidden=false; sw.textContent=(sheetSlot+1)+"번을 이 동작으로"; }
   else sw.hidden=true;
   $("shVid").href="https://www.youtube.com/results?search_query="+encodeURIComponent(e.name+" 운동 방법");
-  $("sheet").hidden=false; document.body.style.overflow="hidden"; $("sheet").scrollTop=0;
+  $("sheet").hidden=false; document.body.style.overflow="hidden"; $("sheet").scrollTop=0; figStart();
 }
 function closeSee(){ $("sheet").hidden=true; if($("stage").hidden)document.body.style.overflow=""; }
 $("shClose").addEventListener("click",closeSee);
@@ -1327,16 +1436,14 @@ document.addEventListener("click",e=>{
     try{ pr.prompt(); pr.userChoice.then(()=>renderInstall(),()=>renderInstall()); }
     catch(e){ renderInstall(); }
     return; }
-  if(t.dataset.goal){ S.goal=t.dataset.goal;
-    const g=GOALS[S.goal];
-    if(g.needs&&!S.style[g.needs]){ S.style[g.needs]=true; renderSettings(); }
-    seedBase=0; renderGoals(); refresh(false); save(); return; }
-  if(t.dataset.min){ S.minutes=+t.dataset.min; renderMin(); refresh(false); save(); return; }
-  if(t.dataset.level){ S.level=+t.dataset.level; renderSettings(); refresh(false); save(); return; }
+  if(t.dataset.kind){ S.kind=t.dataset.kind; renderKinds(); refresh(); save(); return; }
+  if(t.dataset.min){ S.minutes=+t.dataset.min; renderMin(); refresh(); save(); return; }
+  if(t.dataset.level){ S.level=+t.dataset.level; renderMin(); renderKinds(); refresh(); save(); return; }
   if(t.dataset.gear){ S.gear[t.dataset.gear]=!S.gear[t.dataset.gear];
-    renderSettings(); refresh(false); save(); return; }
-  if(t.dataset.style){ S.style[t.dataset.style]=!S.style[t.dataset.style];
-    renderSettings(); refresh(false); save(); return; }
+    renderKinds(); renderSettings(); refresh(); save(); return; }
+  if(t.dataset.quiet){ S.quiet=!S.quiet; renderSettings(); refresh(); save(); return; }
+  if(t.dataset.lock!==undefined){ const i=+t.dataset.lock;
+    if(routine){ routine.lock[i]=!routine.lock[i]; renderRoutine(); } return; }
   if(t.dataset.snd){ S[t.dataset.snd]=!S[t.dataset.snd]; renderSettings(); save();
     if(t.dataset.snd==="sound"&&S.sound)beep(760,120); return; }
   if(t.dataset.lib){ libFilter=t.dataset.lib; renderLib(); return; }
@@ -1349,6 +1456,7 @@ function swapMove(i){
   if(!routine)return;
   const cur=routine.moves[i], have={}; routine.moves.forEach(e=>have[e.id]=1);
   const av=pool();
+  routine.lock[i]=false;
   let c=av.filter(e=>!have[e.id]&&e.part===cur.part);
   if(!c.length)c=av.filter(e=>!have[e.id]);
   if(!c.length)return;
@@ -1356,7 +1464,7 @@ function swapMove(i){
   renderRoutine();
 }
 $("startBtn").addEventListener("click",start);
-$("reshuffleBtn").addEventListener("click",()=>refresh(true));
+$("reshuffleBtn").addEventListener("click",()=>refresh());
 $("stPause").addEventListener("click",()=>{
   paused=!paused; $("stPause").textContent=paused?"이어서 하기":"일시정지";
 });
@@ -1373,7 +1481,8 @@ document.addEventListener("keydown",e=>{
 });
 
 function boot(){
-  renderHead(); renderGoals(); renderMin(); renderSettings(); renderInstall(); refresh(false);
+  renderHead(); renderKinds(); renderMin(); renderSettings(); renderInstall();
+  if(!routine)refresh();
   if(!$("v-log").hidden)renderLog();
   if(!$("v-lib").hidden)renderLib();
 }
