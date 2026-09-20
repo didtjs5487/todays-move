@@ -340,9 +340,25 @@ body[data-view="today"] .wrap{padding-block-end:184px}
 .stbtns button.main{flex:1.6; background:var(--ember); border-color:var(--ember); color:var(--onember);
   font-family:"Hahmlet",serif; font-weight:800; font-size:16px; letter-spacing:0}
 .stbtns button:hover{border-color:var(--mute)}
-.stquit{display:block; margin:9px auto 0; font-family:"Space Mono",monospace; font-size:11px;
-  letter-spacing:.1em; color:var(--mute)}
-.stquit:hover{color:var(--ember)}
+.stx{margin-left:10px; font-size:17px; line-height:1; color:var(--ink2); padding:4px 8px;
+  border:1px solid var(--line); border-radius:4px; background:var(--bg2)}
+.stx:hover{color:var(--ember); border-color:var(--ember)}
+.stquit{display:block; margin:10px auto 0; font-family:"Space Mono",monospace; font-size:12px;
+  letter-spacing:.12em; color:var(--ink2); border:1px solid var(--line); border-radius:4px;
+  padding:9px 22px}
+.stquit:hover{color:var(--ember); border-color:var(--ember)}
+/* 그만두기를 누르면 — 기록할지 그냥 닫을지 그 자리에서 고른다 */
+.quitbox{position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center;
+  padding:20px; background:rgba(4,8,12,.72)}
+.qb{background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:20px 18px;
+  width:min(360px,100%); display:flex; flex-direction:column; gap:9px; box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.qb b{font-family:"Hahmlet",serif; font-weight:800; font-size:21px; text-align:center}
+.qb span{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.08em; color:var(--mute);
+  text-align:center; margin-bottom:6px}
+.qbtn{border:1px solid var(--line); border-radius:4px; padding:13px 10px; font-size:14px; color:var(--ink2)}
+.qbtn:hover{border-color:var(--mute); color:var(--ink)}
+.qbtn.go{background:var(--ember); border-color:var(--ember); color:var(--onember);
+  font-family:"Hahmlet",serif; font-weight:800; font-size:15px}
 .stbar{height:2px; background:var(--hair); margin-bottom:12px}
 .stbar i{display:block; height:100%; background:var(--ink); width:0}
 
@@ -475,7 +491,8 @@ img{max-width:100%}
 
 <!-- ── 타이머 ── -->
 <div class="stage" id="stage" hidden data-phase="prep">
-  <div class="sttop"><span class="ph" id="stPhase">준비</span><span class="rd" id="stRound"></span></div>
+  <div class="sttop"><span class="ph" id="stPhase">준비</span><span class="rd" id="stRound"></span>
+    <button class="stx" id="stClose" aria-label="운동 그만두기">✕</button></div>
   <div class="stmid">
     <div class="st-fig" id="stFig"></div>
     <div class="ringwrap">
@@ -498,7 +515,17 @@ img{max-width:100%}
     <button class="main" id="stPause">일시정지</button>
     <button id="stNextBtn">NEXT ▶</button>
   </div>
-  <button class="stquit" id="stQuit">여기까지 하고 기록</button>
+  <button class="stquit" id="stQuit">■ 그만하기</button>
+
+  <div class="quitbox" id="quitBox" hidden>
+    <div class="qb">
+      <b>그만할까요?</b>
+      <span id="qbInfo"></span>
+      <button class="qbtn go" id="qSave">여기까지 기록하고 끝내기</button>
+      <button class="qbtn" id="qDrop">기록 없이 닫기</button>
+      <button class="qbtn" id="qBack">계속하기</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1316,13 +1343,37 @@ function draw(){
   past+=steps[si].sec-Math.max(0,left);
   $("stBar").style.width=Math.min(100,past/total*100)+"%";
 }
-function finish(partial){
+/* 그만두기 물음 — 묻는 동안 시계를 세워 둔다 */
+let wasPaused=false;
+function openQuit(){
+  if($("stage").hidden)return;
+  wasPaused=paused; paused=true;
+  let done=0; for(let i=0;i<=Math.min(si,steps.length-1);i++)done+=steps[i].sec;
+  const s=steps[si]||{};
+  $("qbInfo").textContent=Math.max(1,Math.round(done/60))+"분 진행"+
+    (s.round?" · 라운드 "+s.round+"/"+routine.rounds:"");
+  $("quitBox").hidden=false;
+}
+function closeQuit(resume){
+  $("quitBox").hidden=true;
+  if(resume)paused=wasPaused;
+}
+/* 기록하지 않고 그냥 닫는다 */
+function abandon(){
+  if(tick)clearInterval(tick); tick=null;
+  try{ if(lock){ lock.release(); lock=null; } }catch(e){}
+  try{ speechSynthesis.cancel(); }catch(e){}
+  closeQuit(false);
+  $("stage").hidden=true; if($("sheet").hidden)document.body.style.overflow="";
+}
+function finish(partial,force){
+  closeQuit(false);
   if(tick)clearInterval(tick); tick=null;
   try{ if(lock){ lock.release(); lock=null; } }catch(e){}
   $("stage").hidden=true; if($("sheet").hidden)document.body.style.overflow="";
   let done=0; for(let i=0;i<=Math.min(si,steps.length-1);i++)done+=steps[i].sec;
   const min=Math.max(1,Math.round(done/60));
-  if(!partial||min>=2){
+  if(!partial||force||min>=2){
     sessions.unshift({ts:Date.now(),goal:routine.goal,min,rounds:routine.rounds,
       ids:routine.moves.map(e=>e.id),names:routine.moves.map(e=>e.name),partial:!!partial});
     sessions=sessions.slice(0,400);
@@ -1470,14 +1521,18 @@ $("stPause").addEventListener("click",()=>{
 });
 $("stPrev").addEventListener("click",()=>jump(-1));
 $("stNextBtn").addEventListener("click",()=>jump(1));
-$("stQuit").addEventListener("click",()=>{ if(confirm("여기까지 하고 기록할까요?"))finish(true); });
+$("stQuit").addEventListener("click",openQuit);
+$("stClose").addEventListener("click",openQuit);
+$("qSave").addEventListener("click",()=>finish(true,true));
+$("qDrop").addEventListener("click",abandon);
+$("qBack").addEventListener("click",()=>closeQuit(true));
 document.addEventListener("keydown",e=>{
   if(!$("sheet").hidden&&e.key==="Escape"){ closeSee(); return; }
   if($("stage").hidden)return;
   if(e.key===" "){ e.preventDefault(); $("stPause").click(); }
   if(e.key==="ArrowRight")jump(1);
   if(e.key==="ArrowLeft")jump(-1);
-  if(e.key==="Escape")$("stQuit").click();
+  if(e.key==="Escape"){ if($("quitBox").hidden)openQuit(); else closeQuit(true); }
 });
 
 function boot(){
