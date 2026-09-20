@@ -1,6 +1,6 @@
 /* 오늘의 무브 — 오프라인에서도 열리게 하는 서비스 워커.
    버전을 올리면 옛 캐시를 지우고 새로 담는다. */
-const V = "todays-move-v5";
+const V = "todays-move-v6";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "./icon-192.png", "./icon-512.png", "./icon-512-maskable.png", "./apple-touch-icon.png"];
 
